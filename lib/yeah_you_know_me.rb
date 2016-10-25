@@ -81,11 +81,21 @@ class YeahYouKnowMe
     loop do
       client = server.accept
       request = listen(client)
+      body = ""
       path = find_path(request)
 
-      body = "Time is now: #{Time.now}"
-      body << "\nHello, World! (#{counter})"
-      body << "<br>"
+      if path == '/hello'
+        body << "\nHello, World! (#{counter})"
+      end
+
+      if path == '/datetime'
+        body << Time.now.strftime('%l:%M%p on %A, %b %d, %Y ')
+      end
+
+      if path == '/shutdown'
+        body << "Total Requests: #{counter}"
+      end
+
       show_diagnostics(request, body)
       page = assemble_page(body)
 
@@ -94,8 +104,8 @@ class YeahYouKnowMe
 
       counter += 1
 
-      break if path == '/shutdown'
       client.close
+      break if path == '/shutdown'
     end
   end
 
