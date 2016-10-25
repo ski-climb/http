@@ -75,6 +75,29 @@ class YeahYouKnowMe
     request.first.split[1]
   end
 
+  def route(path, body, counter)
+    case path
+    when '/hello'
+      hello(body, counter)
+    when '/datetime'
+      datetime(body)
+    when '/shutdown'
+      shutdown(body, counter)
+    end
+  end
+
+  def hello(body, counter)
+    body << "\nHello, World! (#{counter})"
+  end
+
+  def datetime(body)
+    body << Time.now.strftime('%l:%M%p on %A, %b %d, %Y ')
+  end
+
+  def shutdown(body, counter)
+    body << "Total Requests: #{counter}"
+  end
+
   def be_a_server
     server = TCPServer.new 9292 # Server bind to port 9292
     counter = 0
@@ -84,17 +107,7 @@ class YeahYouKnowMe
       body = ""
       path = find_path(request)
 
-      if path == '/hello'
-        body << "\nHello, World! (#{counter})"
-      end
-
-      if path == '/datetime'
-        body << Time.now.strftime('%l:%M%p on %A, %b %d, %Y ')
-      end
-
-      if path == '/shutdown'
-        body << "Total Requests: #{counter}"
-      end
+      route(path, body, counter)
 
       show_diagnostics(request, body)
       page = assemble_page(body)
@@ -103,7 +116,6 @@ class YeahYouKnowMe
       client.puts page
 
       counter += 1
-
       client.close
       break if path == '/shutdown'
     end
