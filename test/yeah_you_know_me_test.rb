@@ -50,5 +50,15 @@ class YeahYouKnowMeTest < Minitest::Test
     assert_equal 5, difference
   end
 
+  def test_it_can_respond_to_a_request_for_the_root_path_with_the_diagnostic_information
+    response = @conn.get('/')
+    assert response.body.include?('Verb:')
+    assert response.body.include?('Path:')
+    assert response.body.include?('Protocol:')
+    assert response.body.include?('Host:')
+    assert response.body.include?('Port:')
+    assert response.body.include?('Origin:')
+    assert response.body.include?('Accept:')
+  end
 
 end
