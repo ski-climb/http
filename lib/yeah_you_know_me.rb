@@ -59,7 +59,8 @@ class YeahYouKnowMe
   end
 
   def get_origin(request)
-    request.find { |s| s.start_with?('Origin:') }.scan(/:\s(.*)/).dig(0,0) if origin?(request)
+    return request.find { |s| s.start_with?('Origin:') }.scan(/:\s(.*)/).dig(0,0) if origin?(request)
+    "Are you too good for your home?"
   end
 
   def origin?(request)
