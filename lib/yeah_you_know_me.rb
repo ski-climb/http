@@ -1,5 +1,6 @@
 require 'socket'
 require 'pry'
+require_relative './parser'
 
 class YeahYouKnowMe
   def listen(client)
@@ -32,63 +33,18 @@ class YeahYouKnowMe
   end
 
   def parse(request)
-    from_request = get_request_hash(request)
-    diagnostic = { verb: get_verb(request),
-                   path: find_path(request),
-                   param: get_param(request),
-                   protocol: get_protocol(request),
-                   host: get_host(from_request),
-                   port: get_port(from_request),
-                   origin: get_origin(from_request),
-                   accept: get_accept(from_request),
-    }
-  end
-
-  def get_request_hash(request)
-    partial_request = request[1..-1]
-    partial_request.map { |e| e.split(': ') }.to_h
-  end
-
-  def get_verb(request)
-    request.first.split[0]
-  end
-
-  def get_protocol(request)
-    request.first.split[2]
-  end
-
-  def get_host(from_request)
-    from_request["Host"].split(':').first
-  end
-
-  def get_port(from_request)
-    from_request["Host"].split(':').last
-  end
-
-  def get_origin(from_request)
-    return from_request["Origin"] if origin?(from_request)
-    "Are you too good for your home?"
-  end
-
-  def origin?(from_request)
-    from_request.has_key?('origin')
-  end
-
-  def get_accept(from_request)
-    from_request["Accept"]
+    parser = Parser.new(request)
+    diagnostic = parser.parse
   end
 
   def find_path(request)
-    request.first.split[1].scan(/\/(\w*)/).dig(0,0)
+    parser = Parser.new(request)
+    parser.find_path
   end
 
   def get_param(request)
-    return request.first.split[1].scan(/\?\w*=(\w*)/).dig(0,0).downcase if params?(request)
-    "Nary a pair of rams to be found."
-  end
-
-  def params?(request)
-    request.first.split[1].include?('?')
+    parser = Parser.new(request)
+    parser.get_param
   end
 
   def route(path, body, counter, request)
