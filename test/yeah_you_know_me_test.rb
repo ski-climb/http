@@ -79,14 +79,16 @@ class YeahYouKnowMeTest < Minitest::Test
     assert pretty_date.body.include?(current_twelve_hour_period)
   end
 
-  # need a way to start the server and shut it down for each test before this one will work
-  #
-  # def test_it_shows_total_number_of_requests_and_kills_server_when_shutdown_path_requested
-  #   close_er_up = @conn.get('/shutdown')
-  #   assert close_er_up.body.include?('Total Requests')
-  #   fails = @conn.get('/')
-  #   assert_equal 100, fails.status
-  # end
+  def test_it_shows_total_number_of_requests_and_kills_server_when_shutdown_path_requested
+    skip #=> This test shuts down the server, so until we fire it up on each run, skip this test
+    close_er_up = @conn.get('/shutdown')
+    assert close_er_up.body.include?('Total Requests')
+    begin
+      @conn.get('/')
+     rescue Faraday::Error::ConnectionFailed
+      puts "The server was shutdown."
+    end
+  end
 
   def test_it_can_print_a_response_to_the_page_when_word_search_path_requested
     word_search = @conn.get('/word_search')

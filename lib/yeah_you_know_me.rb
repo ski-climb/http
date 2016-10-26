@@ -4,6 +4,30 @@ require_relative './parser'
 require_relative './response'
 
 class YeahYouKnowMe
+
+  def initialize
+
+  end
+
+  def be_a_server
+    server = TCPServer.new 9292 # Server bind to port 9292
+    counter = 0
+    loop do
+      client = server.accept
+      request = listen(client)
+      body = ""
+      path = find_path(request)
+
+      route(path, body, counter, request)
+
+      client.puts full_response(body, request)
+
+      counter += 1
+      break if path == 'shutdown'
+      client.close
+    end
+  end
+
   def listen(client)
     request = []
     while line = client.gets and !line.chomp.empty?
@@ -33,22 +57,4 @@ class YeahYouKnowMe
     end
   end
 
-  def be_a_server
-    server = TCPServer.new 9292 # Server bind to port 9292
-    counter = 0
-    loop do
-      client = server.accept
-      request = listen(client)
-      body = ""
-      path = find_path(request)
-
-      route(path, body, counter, request)
-
-      client.puts full_response(body, request)
-
-      counter += 1
-      client.close
-      break if path == '/shutdown'
-    end
-  end
 end
