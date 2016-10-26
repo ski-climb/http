@@ -9,9 +9,8 @@ class Response
     @request = request
   end
 
-  def page
-    show_diagnostics(request, body)
-    "<html><head></head><body>#{body}</body></html>"
+  def full_response
+    headers + "\n" + page
   end
 
   def headers
@@ -24,18 +23,45 @@ class Response
     ].join("\r\n")
   end
 
-  def full_response
-    headers + "\n" + page
+  def page
+    show_diagnostics
+    "<html><head></head><body>#{body}</body></html>"
   end
 
-  def show_diagnostics(request, body)
-    parser = Parser.new(request)
-    diagnostic = parser.parse
+  def show_diagnostics
+    diagnostic = Parser.new(request).parse
     body << "<pre>"
     diagnostic.each do |k, v|
       body << "#{k.capitalize}: #{v}\n"
     end
     body << "</pre>"
+  end
+
+  def hello(counter)
+    body << "\nHello, World! (#{counter})"
+  end
+
+  def datetime
+    body << Time.now.strftime('%l:%M%p on %A, %b %d, %Y ') #=> e.g. 3:52PM on Wednesday, Oct 26, 2016
+  end
+
+  def shutdown(counter)
+    body << "Total Requests: #{counter}"
+  end
+
+  def word_search
+    word = Parser.new(request).get_param
+    word.start_with?("Nary a pair") ? nil : word
+    return body << "#{word} is not a known word" if ! in_dictionary?(word)
+    return body << "#{word} is a known word" if in_dictionary?(word)
+  end
+
+  def in_dictionary?(word)
+    whole_dictionary.include?(word)
+  end
+
+  def whole_dictionary
+    @loaded_dictionary ||= File.read('/usr/share/dict/words').split("\n")
   end
 
 end

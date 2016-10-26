@@ -13,64 +13,24 @@ class YeahYouKnowMe
   end
 
   def full_response(body, request)
-    response = Response.new(body, request)
-    response.full_response
-  end
-
-  def parse(request)
-    parser = Parser.new(request)
-    diagnostic = parser.parse
+    Response.new(body, request).full_response
   end
 
   def find_path(request)
-    parser = Parser.new(request)
-    parser.find_path
-  end
-
-  def get_param(request)
-    parser = Parser.new(request)
-    parser.get_param
+    Parser.new(request).find_path
   end
 
   def route(path, body, counter, request)
     case path
     when 'hello'
-      hello(body, counter)
+      Response.new(body, request).hello(counter)
     when 'datetime'
-      datetime(body)
+      Response.new(body, request).datetime
     when 'shutdown'
-      shutdown(body, counter)
+      Response.new(body, request).shutdown(counter)
     when 'word_search'
-      word_search(body, request)
+      Response.new(body, request).word_search
     end
-  end
-
-  def hello(body, counter)
-    body << "\nHello, World! (#{counter})"
-  end
-
-  def datetime(body)
-    body << Time.now.strftime('%l:%M%p on %A, %b %d, %Y ')
-  end
-
-  def shutdown(body, counter)
-    body << "Total Requests: #{counter}"
-  end
-
-  def word_search(body, request)
-    word = get_param(request)
-    word.start_with?("Nary a pair") ? nil : word
-
-    body << "#{word} is not a known word" if ! in_dictionary?(word)
-    body << "#{word} is a known word" if in_dictionary?(word)
-  end
-
-  def in_dictionary?(word)
-    whole_dictionary.include?(word)
-  end
-
-  def whole_dictionary
-    @loaded_dictionary ||= File.read('/usr/share/dict/words').split("\n")
   end
 
   def be_a_server
