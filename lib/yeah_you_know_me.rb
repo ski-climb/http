@@ -1,6 +1,7 @@
 require 'socket'
 require 'pry'
 require_relative './parser'
+require_relative './response'
 
 class YeahYouKnowMe
   def listen(client)
@@ -11,25 +12,9 @@ class YeahYouKnowMe
     return request
   end
 
-  def assemble_page(body)
-    "<html><head></head><body>#{body}</body></html>"
-  end
-
-  def assemble_headers(page)
-    headers = [ "http/1.1 200 OK",
-                "date: #{Time.now.strftime('%1, %e %b %Y %H:%M:%S %z')}",
-    "server: ruby",
-      "content-type: text/html; charset=iso-8859-1",
-      "content-length: #{page.length}\r\n\r\n"].join("\r\n")
-  end
-
-  def show_diagnostics(request, body)
-    diagnostic = parse(request)
-    body << "<pre>"
-    diagnostic.each do |k, v|
-      body << "#{k.capitalize}: #{v}\n"
-    end
-    body << "</pre>"
+  def full_response(body, request)
+    response = Response.new(body, request)
+    response.full_response
   end
 
   def parse(request)
@@ -99,16 +84,11 @@ class YeahYouKnowMe
 
       route(path, body, counter, request)
 
-      show_diagnostics(request, body)
-      page = assemble_page(body)
-
-      client.puts assemble_headers(page)
-      client.puts page
+      client.puts full_response(body, request)
 
       counter += 1
       client.close
       break if path == '/shutdown'
     end
   end
-
 end
