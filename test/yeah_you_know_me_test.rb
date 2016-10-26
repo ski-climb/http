@@ -16,9 +16,9 @@ class YeahYouKnowMeTest < Minitest::Test
     end
   end
 
-  def teardown
-    @conn.get('/shutdown')
-  end
+  # def teardown
+  #   @conn.get('/shutdown')
+  # end
 
   def test_it_listens_on_port_9292
     response = @conn.get('/')
@@ -125,7 +125,7 @@ class YeahYouKnowMeTest < Minitest::Test
 
   def test_it_can_get_game
     response = @conn.get('/game')
-    assert response.include?('guesses')
+    assert response.body.include?('guesses')
   end
 
   def test_it_can_post_to_start_game
