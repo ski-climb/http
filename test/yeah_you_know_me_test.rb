@@ -16,9 +16,9 @@ class YeahYouKnowMeTest < Minitest::Test
     end
   end
 
-  # def teardown
-  #   @conn.get('/shutdown')
-  # end
+  def teardown
+    @conn.get('/shutdown')
+  end
 
   def test_it_listens_on_port_9292
     response = @conn.get('/')
@@ -88,4 +88,38 @@ class YeahYouKnowMeTest < Minitest::Test
   #   assert_equal 100, fails.status
   # end
 
+  def test_it_can_print_a_response_to_the_page_when_word_search_path_requested
+    word_search = @conn.get('/word_search')
+    assert word_search.body.include?('known word')
+  end
+
+  def test_it_properly_parses_the_path_even_when_params_are_included
+    response = @conn.get('/word_search?word=fragment')
+    path = "Path: word_search"
+    assert response.body.include?(path)
+  end
+
+  def test_it_properly_parses_the_params_when_included
+    response = @conn.get('/word_search?word=fragmen')
+    word_stub = "Param: fragmen"
+    assert response.body.include?(word_stub)
+  end
+
+  def test_it_returns_that_it_is_not_a_word_when_word_stub_is_not_in_dictionary
+    response = @conn.get('/word_search?word=asdfasd')
+    not_a_word = "asdfasd is not a known word"
+    assert response.body.include?(not_a_word)
+  end
+
+  def test_it_returns_that_it_is_a_valid_word_when_word_stub_is_present_in_dictionary
+    response = @conn.get('/word_search?word=dictionary')
+    is_a_word = "dictionary is a known word"
+    assert response.body.include?(is_a_word)
+  end
+
+  def test_it_properly_handles_uppercase_characters
+    response = @conn.get('/word_search?word=DICTIONARY')
+    is_a_word = "dictionary is a known word"
+    assert response.body.include?(is_a_word)
+  end
 end

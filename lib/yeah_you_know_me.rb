@@ -34,6 +34,7 @@ class YeahYouKnowMe
   def parse(request)
     diagnostic = { verb: get_verb(request),
                    path: find_path(request),
+                   param: get_param(request),
                    protocol: get_protocol(request),
                    host: get_host(request),
                    port: get_port(request),
@@ -72,17 +73,28 @@ class YeahYouKnowMe
   end
 
   def find_path(request)
-    request.first.split[1]
+    request.first.split[1].scan(/\/(\w*)/).dig(0,0)
   end
 
-  def route(path, body, counter)
+  def get_param(request)
+    return request.first.split[1].scan(/\?\w*=(\w*)/).dig(0,0).downcase if params?(request)
+    "Nary a pair of rams to be found."
+  end
+
+  def params?(request)
+    request.first.split[1].include?('?')
+  end
+
+  def route(path, body, counter, request)
     case path
-    when '/hello'
+    when 'hello'
       hello(body, counter)
-    when '/datetime'
+    when 'datetime'
       datetime(body)
-    when '/shutdown'
+    when 'shutdown'
       shutdown(body, counter)
+    when 'word_search'
+      word_search(body, request)
     end
   end
 
@@ -98,6 +110,22 @@ class YeahYouKnowMe
     body << "Total Requests: #{counter}"
   end
 
+  def word_search(body, request)
+    word = get_param(request)
+    word.start_with?("Nary a pair") ? nil : word
+
+    body << "#{word} is not a known word" if ! in_dictionary?(word)
+    body << "#{word} is a known word" if in_dictionary?(word)
+  end
+
+  def in_dictionary?(word)
+    whole_dictionary.include?(word)
+  end
+
+  def whole_dictionary
+    @loaded_dictionary ||= File.read('/usr/share/dict/words').split("\n")
+  end
+
   def be_a_server
     server = TCPServer.new 9292 # Server bind to port 9292
     counter = 0
@@ -107,7 +135,7 @@ class YeahYouKnowMe
       body = ""
       path = find_path(request)
 
-      route(path, body, counter)
+      route(path, body, counter, request)
 
       show_diagnostics(request, body)
       page = assemble_page(body)
