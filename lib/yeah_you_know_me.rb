@@ -32,15 +32,21 @@ class YeahYouKnowMe
   end
 
   def parse(request)
+    from_request = get_request_hash(request)
     diagnostic = { verb: get_verb(request),
                    path: find_path(request),
                    param: get_param(request),
                    protocol: get_protocol(request),
-                   host: get_host(request),
-                   port: get_port(request),
-                   origin: get_origin(request),
-                   accept: get_accept(request),
+                   host: get_host(from_request),
+                   port: get_port(from_request),
+                   origin: get_origin(from_request),
+                   accept: get_accept(from_request),
     }
+  end
+
+  def get_request_hash(request)
+    partial_request = request[1..-1]
+    partial_request.map { |e| e.split(': ') }.to_h
   end
 
   def get_verb(request)
@@ -51,25 +57,25 @@ class YeahYouKnowMe
     request.first.split[2]
   end
 
-  def get_host(request)
-    request.find { |s| s.start_with?('Host:') }.scan(/(\S*):\d/).dig(0,0)
+  def get_host(from_request)
+    from_request["Host"].split(':').first
   end
 
-  def get_port(request)
-    request.find { |s| s.start_with?('Host:') }.scan(/:(\d*)\z/).dig(0,0)
+  def get_port(from_request)
+    from_request["Host"].split(':').last
   end
 
-  def get_origin(request)
-    return request.find { |s| s.start_with?('Origin:') }.scan(/:\s(.*)/).dig(0,0) if origin?(request)
+  def get_origin(from_request)
+    return from_request["Origin"] if origin?(from_request)
     "Are you too good for your home?"
   end
 
-  def origin?(request)
-    request.join.downcase.include?('origin')
+  def origin?(from_request)
+    from_request.has_key?('origin')
   end
 
-  def get_accept(request)
-    request.find { |s| s.start_with?('Accept:') }.scan(/:\s(.*)/).dig(0,0)
+  def get_accept(from_request)
+    from_request["Accept"]
   end
 
   def find_path(request)
