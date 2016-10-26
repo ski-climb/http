@@ -122,4 +122,54 @@ class YeahYouKnowMeTest < Minitest::Test
     is_a_word = "dictionary is a known word"
     assert response.body.include?(is_a_word)
   end
+
+  def test_it_can_get_game
+    response = @conn.get('/game')
+    assert response.include?('guesses')
+  end
+
+  def test_it_can_post_to_start_game
+    skip
+    response = @conn.post('/start_game')
+    assert response.include?('Good luck!')
+  end
+
+  def test_posting_to_start_game_causes_a_get_request_to_game
+    skip
+    start = @conn.post('/start_game')
+    play = @conn.get('/game')
+    no_guesses = "0 guesses made"
+    assert play.include?(no_guesses)
+  end
+
+  def test_it_can_post_to_game_to_make_guesses
+    skip
+    respose = @conn.post('/game')
+    # not sure what comes next
+  end
+
+  def test_posting_to_game_to_make_a_guess_causes_a_get_request_to_game
+    skip
+    guess = @conn.post('/game')
+    feedback = @conn.get('/game')
+    possibilities = ['high', 'low', 'correct']
+    # not sure how to test
+  end
+
+  def test_it_can_show_a_guess_is_too_low
+    skip
+    # your guess was too low
+  end
+
+  def test_it_can_show_a_guess_is_too_high
+    skip
+    # your guess was too high
+  end
+
+  def test_it_can_show_a_guess_is_correct
+    skip
+    # goldilocks, your guess was just right
+  end
+
+
 end
