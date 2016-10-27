@@ -79,6 +79,10 @@ class YeahYouKnowMe
       Response.new(body, request).shutdown(counter)
     when 'GET-word_search'
       Response.new(body, request).word_search
+    when 'GET-root'
+      Response.new(body, request).root
+    else
+      Response.new(body, request).blank
     end
   end
 

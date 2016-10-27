@@ -24,9 +24,6 @@ class YeahYouKnowMeTest < Minitest::Test
     get = @conn.get('/')
     assert get.body
     assert_equal 200, get.status
-    post = @conn.post('/')
-    assert post.body
-    assert_equal 200, post.status
   end
 
   def test_it_contains_hello_world_in_response_body
@@ -46,6 +43,7 @@ class YeahYouKnowMeTest < Minitest::Test
 
   def test_it_can_respond_to_a_request_for_the_root_path_with_the_diagnostic_information
     response = @conn.get('/')
+    assert response.body.include?("Home Page")
     assert response.body.include?('Verb:')
     assert response.body.include?('Path:')
     assert response.body.include?('Protocol:')
@@ -74,7 +72,14 @@ class YeahYouKnowMeTest < Minitest::Test
     assert pretty_date.body.include?(current_twelve_hour_period)
   end
 
+  def test_it_shows_intentionally_blank_page_when_any_non_specified_path_is_requested
+    response = @conn.get('/flibbertigibbet')
+    blank_on_purpose = "This page intentionally left blank."
+    assert response.body.include?(blank_on_purpose)
+  end
+
   def test_it_shows_total_number_of_requests_and_kills_server_when_shutdown_path_requested
+    # Admit it, this is kinda bitchin'
     close_er_up = @conn.get('/shutdown')
     assert close_er_up.body.include?('Total Requests')
     begin
@@ -124,7 +129,7 @@ class YeahYouKnowMeTest < Minitest::Test
   def test_it_can_get_game
     skip
     response = @conn.get('/game')
-    assert response.body.include?('guesses')
+    assert response.body.include?('Guesses Made:')
   end
 
   def test_it_can_post_to_start_game
@@ -136,9 +141,6 @@ class YeahYouKnowMeTest < Minitest::Test
   def test_posting_to_start_game_causes_a_get_request_to_game
     skip
     start = @conn.post('/start_game')
-    play = @conn.get('/game')
-    no_guesses = "0 guesses made"
-    assert play.include?(no_guesses)
   end
 
   def test_it_can_post_to_game_to_make_guesses
@@ -150,8 +152,6 @@ class YeahYouKnowMeTest < Minitest::Test
   def test_posting_to_game_to_make_a_guess_causes_a_get_request_to_game
     skip
     guess = @conn.post('/game')
-    feedback = @conn.get('/game')
-    possibilities = ['high', 'low', 'correct']
     # not sure how to test
   end
 

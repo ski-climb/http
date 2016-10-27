@@ -24,6 +24,12 @@ class ParserTest < Minitest::Test
     assert_equal @request, with_request.request
   end
 
+  def test_it_returns_root_when_root_path_is_requested
+    @request[0] = "GET / HTTP/1.1"
+    parser = Parser.new(@request)
+    assert_equal "root", parser.find_path
+  end
+
   def test_it_returns_the_hashyized_hash_with_key_accept
     parser = Parser.new(@request)
     parsed_hash = parser.parsed_request

@@ -54,7 +54,9 @@ class Parser
   end
 
   def find_path
-    request.first.split[1].scan(/\/(\w*)/).dig(0,0)
+    path = request.first.split[1].scan(/\/(\w*)/).dig(0,0)
+    return path unless path.empty?
+    "root"
   end
 
   def get_param

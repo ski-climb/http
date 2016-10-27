@@ -74,6 +74,18 @@ class ResponseTest < Minitest::Test
     assert response.full_response.include?(diagnostic_info)
   end
 
+  def test_it_returns_home_page_when_root_is_requested
+    request = "GET / HTTP/1.1"
+    response = Response.new(@body, request)
+    assert response.root.include?('Home Page')
+  end
+
+  def test_it_returns_intentionally_blank_page_when_other_page_requested
+    request = "GET /flibbertigibbet HTTP/1.1"
+    response = Response.new(@body, request)
+    assert response.blank.include?('This page intentionally left blank.')
+  end
+
   def test_it_returns_hello_world_when_get_hello_requested
     request = "GET /hello HTTP/1.1"
     response = Response.new(@body, request)

@@ -52,6 +52,14 @@ class Response
     body << "Total Requests: #{counter}"
   end
 
+  def root
+    body << "Home Page"
+  end
+
+  def blank
+    body << "This page intentionally left blank."
+  end
+
   def word_search
     word = Parser.new(request).get_param
     word.start_with?("Nary a pair") ? nil : word
