@@ -5,11 +5,13 @@ require_relative './response'
 
 class YeahYouKnowMe
   attr_accessor :request,
+                :request_body,
                 :socket,
                 :body,
                 :server,
                 :verb_path
-  attr_reader :counter
+  attr_reader :counter,
+              :body_content_length
 
   def initialize
     self.server = TCPServer.new(9292)
@@ -21,6 +23,8 @@ class YeahYouKnowMe
       listen
       route_path
       respond
+      
+      # binding.pry
 
       @counter += 1
       break if verb_path == 'GET-shutdown'
@@ -32,6 +36,8 @@ class YeahYouKnowMe
     self.body = ""
     self.socket = server.accept
     self.request = get_request
+    find_content_length
+    get_request_body if body_content_present?
   end
 
   def route_path
@@ -51,8 +57,20 @@ class YeahYouKnowMe
     return request
   end
 
+  def get_request_body
+    self.request_body = socket.read(body_content_length)
+  end
+
   def full_response
     Response.new(body, request).full_response
+  end
+
+  def find_content_length
+    @body_content_length = Parser.new(request).get_content_length
+  end
+
+  def body_content_present?
+    body_content_length > 0
   end
 
   def find_path

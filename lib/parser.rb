@@ -16,6 +16,7 @@ class Parser
                    port: get_port,
                    origin: get_origin,
                    accept: get_accept,
+                   content_length: get_content_length
     }
   end
 
@@ -51,6 +52,10 @@ class Parser
 
   def get_accept
     parsed_request["Accept"]
+  end
+
+  def get_content_length
+    parsed_request["Content-Length"].to_i
   end
 
   def find_path

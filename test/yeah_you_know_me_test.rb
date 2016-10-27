@@ -51,6 +51,7 @@ class YeahYouKnowMeTest < Minitest::Test
     assert response.body.include?('Port:')
     assert response.body.include?('Origin:')
     assert response.body.include?('Accept:')
+    assert response.body.include?('Content_length:')
   end
 
   def test_it_can_respond_with_hello_world_and_counter_when_hello_path_requested

@@ -130,4 +130,17 @@ class ParserTest < Minitest::Test
     accept = response.parse[:accept]
     assert_equal "*/*", accept
   end
+
+  def test_it_parses_the_content_length
+    @request.insert(1, "Content-Length: 8")
+    response = Parser.new(@request)
+    content_length = response.parse[:content_length]
+    assert_equal 8, content_length
+  end
+
+  def test_it_returns_zero_when_no_content_length_present
+    response = Parser.new(@request)
+    content_length = response.parse[:content_length]
+    assert_equal 0, content_length
+  end
 end
