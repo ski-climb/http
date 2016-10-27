@@ -5,20 +5,15 @@ require './lib/yeah_you_know_me'
 require 'pry'
 
 class YeahYouKnowMeTest < Minitest::Test
-
+  `tmux send -t goo_server goo ENTER` && `sleep 1`
 
   def setup
-    # `tmux new -s goo_server` && `tmux detach` && `tmux send -t goo_server goo ENTER`
     @conn = Faraday.new(:url => 'http://127.0.0.1:9292') do |faraday|
       faraday.request  :url_encoded
       faraday.response :logger
       faraday.adapter Faraday.default_adapter
     end
   end
-
-  # def teardown
-  #   @conn.get('/shutdown')
-  # end
 
   def test_it_listens_on_port_9292
     response = @conn.get('/')
@@ -80,14 +75,15 @@ class YeahYouKnowMeTest < Minitest::Test
   end
 
   def test_it_shows_total_number_of_requests_and_kills_server_when_shutdown_path_requested
-    skip #=> This test shuts down the server, so until we fire it up on each run, skip this test
     close_er_up = @conn.get('/shutdown')
     assert close_er_up.body.include?('Total Requests')
     begin
       @conn.get('/')
      rescue Faraday::Error::ConnectionFailed
-      puts "The server was shutdown."
+      puts "\nThe server was shutdown."
+      puts ""
     end
+    `tmux send -t goo_server goo ENTER` && `sleep 1`
   end
 
   def test_it_can_print_a_response_to_the_page_when_word_search_path_requested
