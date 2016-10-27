@@ -4,33 +4,48 @@ require_relative './parser'
 require_relative './response'
 
 class YeahYouKnowMe
+  attr_accessor :request,
+                :socket,
+                :body,
+                :server,
+                :path
+  attr_reader :counter
 
   def initialize
-
+    self.server = TCPServer.new(9292)
   end
 
   def be_a_server
-    server = TCPServer.new 9292 # Server bind to port 9292
-    counter = 0
+    @counter = 0
     loop do
-      client = server.accept
-      request = listen(client)
-      body = ""
-      path = find_path(request)
+      listen
+      route_path
+      respond
 
-      route(path, body, counter, request)
-
-      client.puts full_response(body, request)
-
-      counter += 1
+      @counter += 1
       break if path == 'shutdown'
-      client.close
+      socket.close
     end
   end
 
-  def listen(client)
+  def listen
+    self.body = ""
+    self.socket = server.accept
+    self.request = get_request(socket)
+  end
+
+  def route_path
+    self.path = find_path(request)
+    route(path, body, counter, request)
+  end
+
+  def respond
+    socket.puts full_response(body, request)
+  end
+
+  def get_request(socket)
     request = []
-    while line = client.gets and !line.chomp.empty?
+    while line = socket.gets and !line.chomp.empty?
       request << line.chomp
     end
     return request

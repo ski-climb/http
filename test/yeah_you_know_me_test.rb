@@ -169,6 +169,4 @@ class YeahYouKnowMeTest < Minitest::Test
     skip
     # goldilocks, your guess was just right
   end
-
-
 end

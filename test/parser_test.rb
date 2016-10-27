@@ -26,19 +26,19 @@ class ParserTest < Minitest::Test
 
   def test_it_returns_the_hashyized_hash_with_key_accept
     parser = Parser.new(@request)
-    parsed_hash = parser.from_request
+    parsed_hash = parser.parsed_request
     assert parsed_hash.has_key?('Accept')
   end
 
   def test_it_returns_the_hashyized_hash_with_key_host
     parser = Parser.new(@request)
-    parsed_hash = parser.from_request
+    parsed_hash = parser.parsed_request
     assert parsed_hash.has_key?('Host')
   end
 
   def test_it_returns_the_hashyized_hash_with_key_origin
     parser = Parser.new(@request)
-    parsed_hash = parser.from_request
+    parsed_hash = parser.parsed_request
     assert parsed_hash.has_key?('Origin')
   end
 

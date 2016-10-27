@@ -1,10 +1,10 @@
 class Parser
   attr_reader :request,
-              :from_request
+              :parsed_request
 
   def initialize(request)
     @request = request
-    @from_request = get_request_hash
+    @parsed_request = get_request_hash
   end
 
   def parse
@@ -33,24 +33,24 @@ class Parser
   end
 
   def get_host
-    from_request["Host"].split(':').first
+    parsed_request["Host"].split(':').first
   end
 
   def get_port
-    from_request["Host"].split(':').last
+    parsed_request["Host"].split(':').last
   end
 
   def get_origin
-    return from_request["Origin"] if origin?
+    return parsed_request["Origin"] if origin?
     "Are you too good for your home?"
   end
 
   def origin?
-    from_request.has_key?("Origin")
+    parsed_request.has_key?("Origin")
   end
 
   def get_accept
-    from_request["Accept"]
+    parsed_request["Accept"]
   end
 
   def find_path
