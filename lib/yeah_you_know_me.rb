@@ -31,19 +31,19 @@ class YeahYouKnowMe
   def listen
     self.body = ""
     self.socket = server.accept
-    self.request = get_request(socket)
+    self.request = get_request
   end
 
   def route_path
-    self.path = find_path(request)
-    route(path, body, counter, request)
+    self.path = find_path
+    route
   end
 
   def respond
-    socket.puts full_response(body, request)
+    socket.puts full_response
   end
 
-  def get_request(socket)
+  def get_request
     request = []
     while line = socket.gets and !line.chomp.empty?
       request << line.chomp
@@ -51,15 +51,15 @@ class YeahYouKnowMe
     return request
   end
 
-  def full_response(body, request)
+  def full_response
     Response.new(body, request).full_response
   end
 
-  def find_path(request)
+  def find_path
     Parser.new(request).find_path
   end
 
-  def route(path, body, counter, request)
+  def route
     case path
     when 'hello'
       Response.new(body, request).hello(counter)
