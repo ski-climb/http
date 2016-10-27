@@ -127,4 +127,20 @@ class ResponseTest < Minitest::Test
     response = Response.new(@body, @request)
     assert response.get_game.include?('Guesses Made:')
   end
+
+  def test_it_returns_good_luck_when_post_start_game_requested
+    @request[0] = "POST /start_game HTTP/1.1"
+    response = Response.new(@body, @request)
+    assert response.post_start_game.include?('Good luck!')
+  end
+
+  def test_it_returns_good_luck_when_post_start_game_requested
+    @request[0] = "POST /game HTTP/1.1"
+    request_body = "guess=99"
+    response = Response.new(@body, @request).post_game(request_body)
+    # binding.pry
+    assert response.include?("Last Guess: 99") 
+  end
+
+
 end

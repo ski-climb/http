@@ -133,9 +133,17 @@ class YeahYouKnowMeTest < Minitest::Test
   end
 
   def test_it_can_post_to_start_game
-    skip
     response = @conn.post('/start_game')
-    assert response.include?('Good luck!')
+    assert response.body.include?('Good luck!')
+  end
+
+  def test_it_can_post_to_game_with_a_guess
+    skip
+    my_guess = 99
+    response = @conn.post('/game', { guess: my_guess })
+    assert_equal 302, response.status 
+    game = @conn.get('/game')
+    assert game.body.include?("Last Guess: #{my_guess}")
   end
 
   def test_posting_to_start_game_causes_a_get_request_to_game

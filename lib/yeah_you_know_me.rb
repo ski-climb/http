@@ -25,6 +25,7 @@ class YeahYouKnowMe
       respond
       
       # binding.pry
+      # you're right here.  you juuuust found the request_body (the guess=18)
 
       @counter += 1
       break if verb_path == 'GET-shutdown'
@@ -101,6 +102,10 @@ class YeahYouKnowMe
       Response.new(body, request).root
     when 'GET-game'
       Response.new(body, request).get_game
+    when 'POST-start_game'
+      Response.new(body, request).post_start_game
+    when 'POST-game'
+      Response.new(body, request).post_game(request_body)
     else
       Response.new(body, request).blank
     end

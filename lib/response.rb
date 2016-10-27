@@ -64,6 +64,15 @@ class Response
     body << "Guesses Made:"
   end
 
+  def post_start_game
+    body << "Good luck!"
+  end
+
+  def post_game(request_body)
+    last_guess = request_body.split('=').last
+    body << "Last Guess: #{last_guess}"
+  end
+
   def word_search
     word = Parser.new(request).get_param
     word.start_with?("Nary a pair") ? nil : word
