@@ -81,6 +81,8 @@ class YeahYouKnowMe
       Response.new(body, request).word_search
     when 'GET-root'
       Response.new(body, request).root
+    when 'GET-game'
+      Response.new(body, request).get_game
     else
       Response.new(body, request).blank
     end

@@ -60,6 +60,10 @@ class Response
     body << "This page intentionally left blank."
   end
 
+  def get_game
+    body << "Guesses Made:"
+  end
+
   def word_search
     word = Parser.new(request).get_param
     word.start_with?("Nary a pair") ? nil : word

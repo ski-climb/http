@@ -127,7 +127,6 @@ class YeahYouKnowMeTest < Minitest::Test
   end
 
   def test_it_can_get_game
-    skip
     response = @conn.get('/game')
     assert response.body.include?('Guesses Made:')
   end

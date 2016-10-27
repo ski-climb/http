@@ -121,4 +121,10 @@ class ResponseTest < Minitest::Test
     response = Response.new(@body, @request)
     assert response.word_search.include?("#{word} is not a known word")
   end
+
+  def test_it_returns_a_game_status_page_when_get_game_requested
+    @request[0] = "GET /game HTTP/1.1"
+    response = Response.new(@body, @request)
+    assert response.get_game.include?('Guesses Made:')
+  end
 end
