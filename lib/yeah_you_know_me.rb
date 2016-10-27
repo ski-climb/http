@@ -8,7 +8,7 @@ class YeahYouKnowMe
                 :socket,
                 :body,
                 :server,
-                :path
+                :verb_path
   attr_reader :counter
 
   def initialize
@@ -23,7 +23,7 @@ class YeahYouKnowMe
       respond
 
       @counter += 1
-      break if path == 'shutdown'
+      break if verb_path == 'GET-shutdown'
       socket.close
     end
   end
@@ -35,7 +35,7 @@ class YeahYouKnowMe
   end
 
   def route_path
-    self.path = find_path
+    self.verb_path = find_verb_path
     route
   end
 
@@ -59,15 +59,25 @@ class YeahYouKnowMe
     Parser.new(request).find_path
   end
 
+  def find_verb
+    Parser.new(request).find_verb
+  end
+
+  def find_verb_path
+    verb = find_verb
+    path = find_path
+    "#{verb}-#{path}"
+  end
+
   def route
-    case path
-    when 'hello'
+    case verb_path
+    when 'GET-hello'
       Response.new(body, request).hello(counter)
-    when 'datetime'
+    when 'GET-datetime'
       Response.new(body, request).datetime
-    when 'shutdown'
+    when 'GET-shutdown'
       Response.new(body, request).shutdown(counter)
-    when 'word_search'
+    when 'GET-word_search'
       Response.new(body, request).word_search
     end
   end

@@ -8,7 +8,7 @@ class Parser
   end
 
   def parse
-    diagnostic = { verb: get_verb,
+    diagnostic = { verb: find_verb,
                    path: find_path,
                    param: get_param,
                    protocol: get_protocol,
@@ -24,7 +24,7 @@ class Parser
     partial_request.map { |e| e.split(': ') }.to_h
   end
 
-  def get_verb
+  def find_verb
     request.first.split[0]
   end
 
