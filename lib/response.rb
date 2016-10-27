@@ -1,6 +1,8 @@
 require_relative './parser'
+require 'pry'
 
 class Response
+  attr_accessor :page
   attr_reader :body,
               :request
 
@@ -10,22 +12,23 @@ class Response
   end
 
   def full_response
-    headers + "\n" + page
+    assemble_page
+    return headers + page
   end
 
   def headers
     [
       "http/1.1 200 OK",
-      "date: #{Time.now.strftime('%1, %e %b %Y %H:%M:%S %z')}",
+      "date: #{Time.now.strftime('%a, %e %b %Y %H:%M:%S %z')}",
       "server: ruby",
       "content-type: text/html; charset=iso-8859-1",
       "content-length: #{page.length}\r\n\r\n"
     ].join("\r\n")
   end
 
-  def page
+  def assemble_page
     show_diagnostics
-    "<html><head></head><body>#{body}</body></html>"
+    self.page = "\n<html><head></head><body>#{body}</body></html>"
   end
 
   def show_diagnostics

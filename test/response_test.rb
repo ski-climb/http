@@ -44,13 +44,14 @@ class ResponseTest < Minitest::Test
 
   def test_it_returns_a_well_formatted_body
     response = Response.new(@body, @request)
-    assembled_page = response.page
+    assembled_page = response.assemble_page.strip
     assert assembled_page.start_with?('<html><head></head><body>')
     assert assembled_page.end_with?('</body></html>')
   end
 
   def test_it_returns_headers
     response = Response.new(@body, @request)
+    response.assemble_page
     header_info = "http/1.1 200 OK"
     assert response.headers.include?(header_info)
   end
